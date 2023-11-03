@@ -5,19 +5,19 @@
 > 创作不易，点个star再走吧~
 
 ## 戳一戳（纳西妲版）.js
-##### 安装
+### 安装
 将仓库内的js插件放入./plugin/example文件夹中，即可食用。
-# Git获取方式（本体）
-# Gitee
+#### Git获取方式（本体）
+##### Gitee
 ```
 git clone --depth 1 https://gitee.com/catbos/yunzai_plugins_js/戳一戳/戳一戳（纳西妲版）.js ./plugins/example
 ```
-# Github
+##### Github
 ```
 git clone --depth 1 https://github.com/win-syswow64/yunzai_plugins_js/戳一戳/戳一戳（纳西妲版）.js ./plugins/example
 ```
 
-# 使用说明
+##### 使用说明
 - Bot账号需开启戳一戳功能
 - 手表/PC协议无戳一戳功能
 
