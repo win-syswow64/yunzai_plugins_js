@@ -1,5 +1,10 @@
 # yunzai_plugins_js
 
+- [Github仓库](https://github.com/win-syswow64/yunzai_plugins_js)
+
+- [Gitee仓库](https://gitee.com/catbos/yunzai_plugins_js)
+
+
 #### 介绍
 此仓库的插件为适配云崽的单js插件，闲的没事写来练手的JS插件，当前版本不一定完善，敬请谅解。
 > 创作不易，点个star再走吧~
