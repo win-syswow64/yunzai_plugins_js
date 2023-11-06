@@ -24,6 +24,7 @@ let uploadRecord = ""
 let speaker = "纳西妲_ZH" //生成角色
 let text = ""
 let master = "主人"
+let mutetime = 1 //禁言时间设置，单位分钟，如果设置0则为自动递增，如需关闭禁言请修改触发概率为0
 
 /*判断是否有枫叶插件，如果有则导入枫叶的高清语音处理方法**/
 if (fs.existsSync('plugins/hs-qiqi-plugin/model/uploadRecord.js')) {
@@ -159,7 +160,11 @@ export class chuo extends plugin {
         }
         if (e.target_id == cfg.qq) {
             let count = await redis.get(`Yz:pokecount:`);//${e.group_id}
-            let usercount = await redis.get('Yz:pokecount' + e.operator_id + ':')
+            let usercount = mutetime
+            if (mutetime == 0) {
+                usercount = await redis.get('Yz:pokecount' + e.operator_id + ':')
+            }
+
             // 当前时间
             let time = moment(Date.now())
                 .add(1, "days")
