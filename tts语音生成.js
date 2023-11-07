@@ -1,4 +1,4 @@
-﻿import plugin from '../../lib/plugins/plugin.js';
+import plugin from '../../lib/plugins/plugin.js';
 import {
 	segment
 } from "oicq";
@@ -78,7 +78,7 @@ export class voicecreate extends plugin {
 				reg: `^#?语音混合比设置\\d+$`,
 				fnc: `sdp_ratioset`
 			}, {
-				reg: `^#?语言设置\\d+$`,
+				reg: `^#?语言设置?(.*)$`,
 				fnc: `languageset`
 			}, {
 				reg: `^#?(.*)语音?(.*)$`,
@@ -148,7 +148,7 @@ export class voicecreate extends plugin {
 			e.reply(`参数不符合要求！(5<x<20)`)
 			return true
 		}
-		lengthScale = speednum / 10
+		lengthScale = lengthnum / 10
 		e.reply(`已成功设置`)
 		return true
 	}
