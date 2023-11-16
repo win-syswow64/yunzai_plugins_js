@@ -35,8 +35,8 @@ if (fs.existsSync('plugins/hs-qiqi-plugin/model/uploadRecord.js')) {
 const chuo_path = path + '/resources/chuochuo/';
 
 //图片需要从1开始用数字命名并且保存为jpg或者gif格式，存在Yunzai-Bot/resources/chuochuo目录下
-let jpg_number = 35 //输入jpg图片数量
-let gif_number = 2 //输入gif图片数量
+let jpg_number = 42 //输入jpg图片数量
+let gif_number = 3 //输入gif图片数量
 
 
 //回复文字列表
@@ -146,7 +146,7 @@ export class chuo extends plugin {
     async chuoyichuo(e) {
         logger.info('[戳一戳生效]')
         if (cfg.masterQQ.includes(e.target_id)) {
-            if (cfg.masterQQ.includes(e.operator_id)) {
+            if (cfg.masterQQ.includes(e.operator_id) || cfg.qq == e.operator_id) {
                 return;
             }
             e.reply([
@@ -180,10 +180,12 @@ export class chuo extends plugin {
                     EX: exTime,
                 });
             }
-            if (!usercount) {
-                await redis.set('Yz:pokecount' + e.operator_id + ':', 1 * 1, { EX: exTime });
-            } else {
-                await redis.set('Yz:pokecount' + e.operator_id + ':', ++usercount, { EX: exTime, });
+            if (mutetime == 0) {
+                if (!usercount) {
+                    await redis.set('Yz:pokecount' + e.operator_id + ':', 1 * 1, { EX: exTime });
+                } else {
+                    await redis.set('Yz:pokecount' + e.operator_id + ':', ++usercount, { EX: exTime, });
+                }
             }
             if (Math.ceil(Math.random() * 100) <= 20 && count >= 10) {
                 let conf = cfg.getGroup(e.group_id);
@@ -342,6 +344,7 @@ V1.0 Bate 0.1 10.23 修复了图片发送与语音合成。
 V1.1 Bate 0.1 10.29 增加了戳主人相关内容。
 V1.1 Bate 0.2 11.01 修复了语音API失效问题
 V1.1 Bate 0.3 11.06 适配新版语音API
+V1.1 Bate 0.4 11.17 修复了机器人戳主人会触发戳主人功能的BUG
 */
 
 /*
