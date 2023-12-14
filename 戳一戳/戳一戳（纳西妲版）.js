@@ -14,30 +14,27 @@ let reply_voice = 0.15 //语音回复概率
 let mutepick = 0.22 //禁言概率
 let example = 0 //拍一拍表情概率
 //剩下的0.08概率就是反击
+let ttsapichoose = 'api1' //api设置
 let noiseScale = 0.2  //情感控制
 let noiseScaleW = 0.2 //发音时长
 let lengthScale = 1 //语速
 let sdp_ratio = 0.2 //SDP/DP混合比
 let language = 'ZH'
-let url = 'https://genshinvoice.top/api'
+let api1url = 'https://api.lolimi.cn/API/yyhc/y.php'
+let api2url = 'https://v2.genshinvoice.top/run/predict'
 let uploadRecord = ""
-let speaker = "纳西妲_ZH" //生成角色
+let speakerapi1 = "纳西妲" //生成角色api1
+let speakerapi2 = "纳西妲_ZH" //生成角色api2
 let text = ""
 let master = "主人"
 let mutetime = 1 //禁言时间设置，单位分钟，如果设置0则为自动递增，如需关闭禁言请修改触发概率为0
-
-/*判断是否有枫叶插件，如果有则导入枫叶的高清语音处理方法**/
-if (fs.existsSync('plugins/hs-qiqi-plugin/model/uploadRecord.js')) {
-    uploadRecord = (await import("../hs-qiqi-plugin/model/uploadRecord.js")).default
-}
 
 //定义图片存放路径 默认是Yunzai-Bot/resources/chuochuo
 const chuo_path = path + '/resources/chuochuo/';
 
 //图片需要从1开始用数字命名并且保存为jpg或者gif格式，存在Yunzai-Bot/resources/chuochuo目录下
-let jpg_number = 42 //输入jpg图片数量
+let jpg_number = 80 //输入jpg图片数量
 let gif_number = 3 //输入gif图片数量
-
 
 //回复文字列表
 let word_list = [
@@ -160,7 +157,7 @@ export class chuo extends plugin {
         }
         if (e.target_id == cfg.qq) {
             let count = await redis.get(`Yz:pokecount:`);//${e.group_id}
-            let usercount = mutetime
+            let usercount = mutetime - 1
             if (mutetime == 0) {
                 usercount = await redis.get('Yz:pokecount' + e.operator_id + ':')
             }
@@ -225,8 +222,39 @@ export class chuo extends plugin {
                 let Text = voice[Math.floor(Math.random() * voice.length)];
                 text = `${Text}` //更新合成内容
                 logger.info(`合成:${text}`)
-                let audioLink = `${url}?speaker=${speaker}&text=${text}&format=mp3&language=${language}&length=${lengthScale}&sdp=${sdp_ratio}&noise=${noiseScale}&noisew=${noiseScaleW}`
-                fetch(audioLink)
+                let audiourl = ''
+                if (ttsapichoose == 'api1') {
+                    let audioLink = `${api1url}?msg=${text}&speaker=${speakerapi1}&Length=${lengthScale}&noisew=${noiseScaleW}&sdp=${sdp_ratio}&noise=${noiseScale}`
+                    let responsel = await fetch(audioLink)
+                    responsel = await responsel.json()
+                    audiourl = responsel.music
+                } else if (ttsapichoose == 'api2') {
+                    let data = JSON.stringify({
+                        "data": [`${text}`, `${speakerapi2}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, null, "Happy", "Text prompt"],
+                        "event_data": null,
+                        "fn_index": 0,
+                        "session_hash": "v141oxnc02o"
+                    })
+                    let responsel = await fetch(api2url
+                        , {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+                            'Accept-Language': 'en-US,en;q=0.5',
+                            'method': 'POST',
+                            'headers': {
+                                'Content-Type': 'application/json',
+                                'Content-Length': data.length
+                            },
+                            'body': data
+                        }
+                    )
+                    responsel = await responsel.json()
+                    audiourl = `https://v2.genshinvoice.top/file=${responsel.data[1].name}`
+                } else {
+                    e.reply("API选择错误，已重置为api1")
+                    ttsapichoose = 'api1'
+                    return;
+                }
+                fetch(audiourl)
                     .then(responsel => {
                         if (!responsel.ok) {
                             e.reply(`服务器返回状态码异常, ${responsel.status}`)
@@ -236,18 +264,13 @@ export class chuo extends plugin {
                     })
                     .then(async buffer => {
                         await new Promise((resolve, reject) => {
-                            fs.writeFile('plugins/example/audo.mp3', buffer, (err) => {
+                            fs.writeFile('plugins/example/audo.wav', buffer, (err) => {
                                 if (err) reject(err);
                                 else resolve();
                             })
                         })
-                        if (fs.existsSync('plugins/hs-qiqi-plugin/model/uploadRecord.js')) {
-                            e.reply(await uploadRecord(`plugins/example/audo.mp3`, 0, false))
-                            return;
-                        } else {
-                            e.reply(segment.record('plugins/example/audo.mp3'))
-                            return;
-                        }
+                        e.reply(segment.record('plugins/example/audo.wav'))
+                        return;
                     })
                     .catch(error => {
                         e.reply(`文件保存错误`)
@@ -256,56 +279,46 @@ export class chuo extends plugin {
             }
             //禁言
             else if (random_type < (reply_text + reply_img + reply_voice + mutepick)) {
+                logger.info(e.operator_id + `将要被禁言${usercount + 1}分钟`)
+                if (usercount >= 36) {
+                    e.reply('我生气了！小黑屋冷静冷静')
+                    await common.sleep(1000)
+                    await e.group.muteMember(e.operator_id, 21600)
+                    return
+                }
                 //n种禁言方式，随机选一种
                 let mutetype = Math.ceil(Math.random() * 4)
                 if (mutetype == 1) {
                     e.reply('我生气了！砸挖撸多!木大！木大木大！')
                     await common.sleep(1000)
-                    if (usercount >= 36) {
-                        await e.group.muteMember(e.operator_id, 21600)
-                    }
-                    else {
-                        await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
-                    }
+                    await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
                 }
-                else if (mutetype == 2) {
+                if (mutetype == 2) {
                     e.reply('不！！')
                     await common.sleep(1000);
                     e.reply('准！！')
                     await common.sleep(1000);
                     e.reply('戳！！')
                     await common.sleep(1000);
-                    if (usercount >= 36) {
-                        await e.group.muteMember(e.operator_id, 21600)
-                    }
-                    else {
-                        await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
-                    }
+                    await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
                     await common.sleep(1000);
                     e.reply('所闻遍计！！')
+                    return
                 }
-                else if (mutetype == 3) {
+                if (mutetype == 3) {
                     e.reply('看我超级纳西妲旋风！')
                     await common.sleep(1000)
                     await e.group.pokeMember(e.operator_id)
-                    if (usercount >= 36) {
-                        await e.group.muteMember(e.operator_id, 21600)
-                    }
-                    else {
-                        await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
-                    }
+                    await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
                     await common.sleep(1000);
+                    return
                 }
-                else if (mutetype == 4) {
+                if (mutetype == 4) {
                     e.reply('哼，我可是会还手的哦——“所闻遍计！')
                     await common.sleep(1000)
                     await e.group.pokeMember(e.operator_id)
-                    if (usercount >= 36) {
-                        await e.group.muteMember(e.operator_id, 21600)
-                    }
-                    else {
-                        await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
-                    }
+                    await e.group.muteMember(e.operator_id, 60 * (usercount + 1))
+                    return
                 }
             }
 
@@ -345,10 +358,21 @@ V1.1 Bate 0.1 10.29 增加了戳主人相关内容。
 V1.1 Bate 0.2 11.01 修复了语音API失效问题
 V1.1 Bate 0.3 11.06 适配新版语音API
 V1.1 Bate 0.4 11.17 修复了机器人戳主人会触发戳主人功能的BUG
+V1.2 Bate 0.1 12.14 1.适配了新的语音API。2.语音API支持双语音API
 */
-
 /*
-支持角色
+api1支持角色
+空, 荧, 派蒙, 纳西妲, 阿贝多, 温迪, 枫原万叶, 钟离, 荒泷一斗, 八重神子, 艾尔海森, 提纳里, 迪希雅, 卡维, 宵宫, 莱依拉, 赛诺, 诺艾尔, 托马, 凝光, 莫娜, 北斗, 神里绫华, 雷电将军, 
+芭芭拉, 鹿野院平藏, 五郎, 迪奥娜, 凯亚, 安柏, 班尼特, 琴, 柯莱, 夜兰, 妮露, 辛焱, 珐露珊, 魈, 香菱, 达达利亚, 砂糖, 早柚, 云堇, 刻晴, 丽莎, 迪卢克, 烟绯, 重云, 珊瑚宫心海, 胡桃,
+可莉, 流浪者, 久岐忍, 神里绫人, 甘雨, 戴因斯雷布, 优菈, 菲谢尔, 行秋, 白术, 九条裟罗, 雷泽, 申鹤, 迪娜泽黛, 凯瑟琳, 多莉, 坎蒂丝, 萍姥姥, 罗莎莉亚, 留云借风真君, 绮良良, 瑶瑶, 七七, 
+奥兹, 米卡, 夏洛蒂, 埃洛伊, 博士, 女士, 大慈树王, 三月七, 娜塔莎, 希露瓦, 虎克, 克拉拉, 丹恒, 希儿, 布洛妮娅, 瓦尔特, 杰帕德, 佩拉, 姬子, 艾丝妲, 白露, 星, 穹, 桑博, 伦纳德, 停云, 罗刹, 
+卡芙卡, 彦卿, 史瓦罗, 螺丝咕姆, 阿兰, 银狼, 素裳, 丹枢, 黑塔, 景元, 帕姆, 可可利亚, 半夏, 符玄, 公输师傅, 奥列格, 青雀, 大毫, 青镞, 费斯曼, 绿芙蓉, 镜流, 信使, 丽塔, 失落迷迭, 缭乱星棘,
+ 伊甸, 伏特加女孩, 狂热蓝调, 莉莉娅, 萝莎莉娅, 八重樱, 八重霞, 卡莲, 第六夜想曲, 卡萝尔, 姬子, 极地战刃, 布洛妮娅, 次生银翼, 理之律者, 真理之律者, 迷城骇兔, 希儿, 魇夜星渊, 黑希儿, 
+ 帕朵菲莉丝, 天元骑英, 幽兰黛尔, 德丽莎, 月下初拥, 朔夜观星, 暮光骑士, 明日香, 李素裳, 格蕾修, 梅比乌斯, 渡鸦, 人之律者, 爱莉希雅, 爱衣, 天穹游侠, 琪亚娜, 空之律者, 终焉之律者, 薪炎之律者,
+  云墨丹心, 符华, 识之律者, 维尔薇, 始源之律者, 芽衣, 雷之律者, 苏莎娜, 阿波尼亚, 陆景和, 莫弈, 夏彦, 左然
+*/
+/*
+api2支持角色
 "埃德_ZH","塔杰·拉德卡尼_ZH","行秋_ZH","深渊使徒_ZH","凯瑟琳_ZH","常九爷_ZH","神里绫人_ZH","丽莎_ZH","纯水精灵?_ZH","宛烟_ZH","重云_ZH","悦_ZH","莱依拉_ZH","鹿野奈奈_ZH",
 "式大将_ZH","白术_ZH","埃舍尔_ZH","莫娜_ZH","优菈_ZH","琴_ZH","凯亚_ZH","西拉杰_ZH","凝光_ZH","石头_ZH","达达利亚_ZH","伊利亚斯_ZH","艾尔海森_ZH","慧心_ZH","「大肉丸」_ZH",
 "柊千里_ZH","玛乔丽_ZH","神里绫华_ZH","菲米尼_ZH","甘雨_ZH","掇星攫辰天君_ZH","坎蒂丝_ZH","上杉_ZH","阿尔卡米_ZH","戴因斯雷布_ZH","艾文_ZH","回声海螺_ZH","九条裟罗_ZH",
@@ -386,8 +410,6 @@ V1.1 Bate 0.4 11.17 修复了机器人戳主人会触发戳主人功能的BUG
 "斯坦利_EN","毗伽尔_EN","诗筠_EN","慧心_EN","恶龙_EN","小仓澪_EN","知易_EN","恕筠_EN","克列门特_EN","大慈树王_EN","维多利亚_EN","黑田_EN","宁禄_EN","马姆杜_EN","西拉杰_EN","上杉_EN",
 "阿尔卡米_EN","常九爷_EN","纯水精灵_EN","田铁嘴_EN","沙扎曼_EN","加萨尼_EN","克罗索_EN","莱斯格_EN","星稀_EN","阿巴图伊_EN","悦_EN","德田_EN","阿佩普_EN","埃尔欣根_EN","萨赫哈蒂_EN",
 "洛伦佐_EN","深渊使徒_EN","塔杰·拉德卡尼_EN","泽田_EN","安西_EN","理水叠山真君_EN","萨齐因_EN","古田_EN"
-*/
-/*
 支持语言
 ZH:中文   JP:日语    EN：英语
 */
