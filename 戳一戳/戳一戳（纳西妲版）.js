@@ -224,13 +224,13 @@ export class chuo extends plugin {
                 logger.info(`合成:${text}`)
                 let audiourl = ''
                 if (ttsapichoose == 'api1') {
-                    let audioLink = `${api1url}?msg=${text}&speaker=${speakerapi1}&Length=${lengthScale}&noisew=${noiseScaleW}&sdp=${sdp_ratio}&noise=${noiseScale}`
+                    let audioLink = `${api1url}?msg=${text}&speaker=${speakerapi1}&Length=${lengthScale}&noisew=${noiseScaleW}&sdp=${sdp_ratio}&noise=${noiseScale}&yy='中'`
                     let responsel = await fetch(audioLink)
                     responsel = await responsel.json()
                     audiourl = responsel.music
                 } else if (ttsapichoose == 'api2') {
                     let data = JSON.stringify({
-                        "data": [`${text}`, `${speakerapi2}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, null, "Happy", "Text prompt"],
+                        "data": [`${text}`, `${speakerapi2}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, null, "Happy", "Text prompt", "", 0.7],
                         "event_data": null,
                         "fn_index": 0,
                         "session_hash": "v141oxnc02o"
