@@ -141,8 +141,8 @@ export class chuo extends plugin {
 
 
     async chuoyichuo(e) {
-        logger.info('[戳一戳生效]')
         if (cfg.masterQQ.includes(e.target_id)) {
+            logger.info('[戳主人生效]')
             if (cfg.masterQQ.includes(e.operator_id) || cfg.qq == e.operator_id) {
                 return;
             }
@@ -156,6 +156,7 @@ export class chuo extends plugin {
             return true
         }
         if (e.target_id == cfg.qq) {
+            logger.info('[戳一戳生效]')
             let count = await redis.get(`Yz:pokecount:`);//${e.group_id}
             let usercount = mutetime - 1
             if (mutetime == 0) {
@@ -198,12 +199,14 @@ export class chuo extends plugin {
 
             //回复随机文字
             if (random_type < reply_text) {
+                logger.info('[回复随机文字生效]')
                 let text_number = Math.ceil(Math.random() * word_list['length'])
-                await e.reply(word_list[text_number - 1])
+                e.reply(word_list[text_number - 1])
             }
 
             //回复随机图片
             else if (random_type < (reply_text + reply_img)) {
+                logger.info('[回复随机图片生效]')
 
                 let photo_number = Math.ceil(Math.random() * (jpg_number + gif_number))
 
@@ -219,6 +222,7 @@ export class chuo extends plugin {
 
             //回复随机语音
             else if (random_type < (reply_text + reply_img + reply_voice)) {
+                logger.info('[回复随机语音生效]')
                 let Text = voice[Math.floor(Math.random() * voice.length)];
                 text = `${Text}` //更新合成内容
                 logger.info(`合成:${text}`)
@@ -279,6 +283,7 @@ export class chuo extends plugin {
             }
             //禁言
             else if (random_type < (reply_text + reply_img + reply_voice + mutepick)) {
+                logger.info('[禁言生效]')
                 logger.info(e.operator_id + `将要被禁言${usercount + 1}分钟`)
                 if (usercount >= 36) {
                     e.reply('我生气了！小黑屋冷静冷静')
@@ -359,6 +364,7 @@ V1.1 Bate 0.2 11.01 修复了语音API失效问题
 V1.1 Bate 0.3 11.06 适配新版语音API
 V1.1 Bate 0.4 11.17 修复了机器人戳主人会触发戳主人功能的BUG
 V1.2 Bate 0.1 12.14 1.适配了新的语音API。2.语音API支持双语音API
+V1.2 Bate 0.1 12.19 1.修复语音API。2.新增更多DeBUG信息。
 */
 /*
 api1支持角色
