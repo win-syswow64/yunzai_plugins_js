@@ -11,7 +11,7 @@ let noiseScaleW = 0.2 //发音时长
 let lengthScale = 1 //语速
 let sdp_ratio = 0.2 //SDP/DP混合比
 let language = "ZH"//语言设置
-let ttsapi = "https://genshinvoice.top/api"
+let ttsapi = "https://v2.genshinvoice.top/run/predict"
 let languageMap = {
 	"ZH": "ZH",
 	"JP": "JP",
@@ -94,9 +94,31 @@ export class voicecreate extends plugin {
 			e.reply(`暂未支持该角色，发送"(#)语音生成帮助"查看列表`)
 			return true
 		}
+		speaker = `${speaker}_${language}`
 		let text = e.msg.replace(/^#?(.*)语音?/g, '')
-		let geturl = `${ttsapi}?speaker=${speaker}_${language}&text=${text}&format=mp3&language=${language}&length=${lengthScale}&sdp=${sdp_ratio}&noise=${noiseScale}&noisew=${noiseScaleW}`
-		fetch(geturl)
+		logger.info(text)
+		logger.info(speaker)
+		let data = JSON.stringify({
+			"data": [`${text}`, `${speaker}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, null, "Happy", "Text prompt", "", 0.7],
+			"event_data": null,
+			"fn_index": 0,
+			"session_hash": "v141oxnc02o"
+		})
+		let responsel = await fetch(ttsapi
+			, {
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+				'Accept-Language': 'en-US,en;q=0.5',
+				'method': 'POST',
+				'headers': {
+					'Content-Type': 'application/json',
+					'Content-Length': data.length
+				},
+				'body': data
+			}
+		)
+		responsel = await responsel.json()
+		let audiourl = `https://v2.genshinvoice.top/file=${responsel.data[1].name}`
+		fetch(audiourl)
 			.then(responsel => {
 				if (!responsel.ok) {
 					e.reply(`服务器返回状态码异常, ${responsel.status}`)
@@ -106,12 +128,12 @@ export class voicecreate extends plugin {
 			})
 			.then(async buffer => {
 				await new Promise((resolve, reject) => {
-					fs.writeFile('plugins/example/tts.mp3', buffer, (err) => {
+					fs.writeFile('plugins/example/tts.wav', buffer, (err) => {
 						if (err) reject(err);
 						else resolve();
 					})
 				})
-				e.reply(segment.record('plugins/example/tts.mp3'))
+				e.reply(segment.record('plugins/example/tts.wav'))
 				return;
 			})
 			.catch(error => {
