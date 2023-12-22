@@ -6,6 +6,10 @@ import moment from "moment";
 import fetch from 'node-fetch'
 import fs from 'fs'
 const path = process.cwd()
+
+//如使用非icqq请在此处填写机器人QQ号
+let BotQQ = ''
+
 // 支持信息详见文件最下方
 //在这里设置事件概率,请保证概率加起来小于1，少于1的部分会触发反击
 let reply_text = 0.4 //文字回复概率
@@ -143,7 +147,7 @@ export class chuo extends plugin {
     async chuoyichuo(e) {
         if (cfg.masterQQ.includes(e.target_id)) {
             logger.info('[戳主人生效]')
-            if (cfg.masterQQ.includes(e.operator_id) || cfg.qq == e.operator_id) {
+            if (cfg.masterQQ.includes(e.operator_id) || cfg.qq == e.operator_id || BotQQ == e.operator_id) {
                 return;
             }
             e.reply([
@@ -155,9 +159,9 @@ export class chuo extends plugin {
             e.group.pokeMember(e.operator_id);
             return true
         }
-        if (e.target_id == cfg.qq) {
+        if (e.target_id == cfg.qq || BotQQ == e.operator_id) {
             logger.info('[戳一戳生效]')
-            let count = await redis.get(`Yz:pokecount:`);//${e.group_id}
+            let count = await redis.get(`Yz:pokecount:`);
             let usercount = mutetime - 1
             if (mutetime == 0) {
                 usercount = await redis.get('Yz:pokecount' + e.operator_id + ':')
