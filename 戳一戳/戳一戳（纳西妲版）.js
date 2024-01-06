@@ -159,9 +159,9 @@ export class chuo extends plugin {
             e.group.pokeMember(e.operator_id);
             return true
         }
-        if (e.target_id == cfg.qq || BotQQ == e.operator_id) {
+        if (e.target_id == cfg.qq || BotQQ == e.target_id) {
             logger.info('[戳一戳生效]')
-            let count = await redis.get(`Yz:pokecount:`);
+            let count = await redis.get(`Yz:pokecount:`);//${e.group_id}
             let usercount = mutetime - 1
             if (mutetime == 0) {
                 usercount = await redis.get('Yz:pokecount' + e.operator_id + ':')
