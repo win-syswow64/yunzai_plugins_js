@@ -13,6 +13,11 @@
 ### 安装
 将仓库内的js插件放入./plugin/example文件夹中，即可食用。
 
+- Curl
+``` bash
+curl -# -L -o "./plugins/example/戳一戳（纳西妲版）.js" "https://gitee.com/catbos/yunzai_plugins_js/blob/master/%E6%88%B3%E4%B8%80%E6%88%B3/%E6%88%B3%E4%B8%80%E6%88%B3%EF%BC%88%E7%BA%B3%E8%A5%BF%E5%A6%B2%E7%89%88%EF%BC%89.js"
+```
+
 ### 使用说明
 - Bot账号需开启戳一戳功能
 - 手表/PC协议无戳一戳功能
@@ -20,6 +25,11 @@
 ## 每日一图.js
 ### 安装
 将仓库内的js插件放入./plugin/example文件夹中，即可食用。
+
+- Curl
+``` bash
+curl -# -L -o "./plugins/example/每日一图.js" "https://gitee.com/catbos/yunzai_plugins_js/blob/master/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%9B%BE.js"
+```
 
 ### 使用说明
 | 用法          | 作用          |
@@ -30,6 +40,11 @@
 ## tts语音生成.js
 ### 安装
 将仓库内的js插件放入./plugin/example文件夹中，即可食用。
+
+- Curl
+``` bash
+curl -# -L -o "./plugins/example/tts语音生成.js" "https://gitee.com/catbos/yunzai_plugins_js/blob/master/tts%E8%AF%AD%E9%9F%B3%E7%94%9F%E6%88%90.js"
+```
 
 ### 使用说明
 | 用法          | 作用          |
