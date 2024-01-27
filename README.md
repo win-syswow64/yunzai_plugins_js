@@ -15,7 +15,7 @@
 
 - Curl
 ``` bash
-curl -# -L -o "./plugins/example/戳一戳（纳西妲版）.js" "https://gitee.com/catbos/yunzai_plugins_js/blob/master/%E6%88%B3%E4%B8%80%E6%88%B3/%E6%88%B3%E4%B8%80%E6%88%B3%EF%BC%88%E7%BA%B3%E8%A5%BF%E5%A6%B2%E7%89%88%EF%BC%89.js"
+curl -# -L -o "./plugins/example/戳一戳（纳西妲版）.js" "https://gitee.com/catbos/yunzai_plugins_js/raw/master/%E6%88%B3%E4%B8%80%E6%88%B3/%E6%88%B3%E4%B8%80%E6%88%B3%EF%BC%88%E7%BA%B3%E8%A5%BF%E5%A6%B2%E7%89%88%EF%BC%89.js"
 ```
 
 ### 使用说明
@@ -28,7 +28,7 @@ curl -# -L -o "./plugins/example/戳一戳（纳西妲版）.js" "https://gitee.
 
 - Curl
 ``` bash
-curl -# -L -o "./plugins/example/每日一图.js" "https://gitee.com/catbos/yunzai_plugins_js/blob/master/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%9B%BE.js"
+curl -# -L -o "./plugins/example/每日一图.js" "https://gitee.com/catbos/yunzai_plugins_js/raw/master/%E6%AF%8F%E6%97%A5%E4%B8%80%E5%9B%BE.js"
 ```
 
 ### 使用说明
@@ -43,7 +43,7 @@ curl -# -L -o "./plugins/example/每日一图.js" "https://gitee.com/catbos/yunz
 
 - Curl
 ``` bash
-curl -# -L -o "./plugins/example/tts语音生成.js" "https://gitee.com/catbos/yunzai_plugins_js/blob/master/tts%E8%AF%AD%E9%9F%B3%E7%94%9F%E6%88%90.js"
+curl -# -L -o "./plugins/example/tts语音生成.js" "https://gitee.com/catbos/yunzai_plugins_js/raw/master/tts%E8%AF%AD%E9%9F%B3%E7%94%9F%E6%88%90.js"
 ```
 
 ### 使用说明
