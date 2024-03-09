@@ -99,7 +99,7 @@ export class voicecreate extends plugin {
 		logger.info(text)
 		logger.info(speaker)
 		let data = JSON.stringify({
-			"data": [`${text}`, `${speaker}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, null, "Happy", "Text prompt", "", 0.7],
+			"data": [`${text}`, `${speaker}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, true, 1, 0.2, null, "Happy", "", "", 0.7],
 			"event_data": null,
 			"fn_index": 0,
 			"session_hash": "v141oxnc02o"
