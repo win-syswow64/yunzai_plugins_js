@@ -9,6 +9,12 @@
 此仓库的插件为适配云崽的单js插件，闲的没事写来练手的JS插件，当前版本不一定完善，敬请谅解。
 > 创作不易，点个star再走吧~
 
+#### 重要：tts语音与戳一戳语音必须安装ffmpeg。
+
+[点我查看Windows教程](https://blog.115832958.xyz/archives/8)
+
+[点我查看Linux教程](https://blog.115832958.xyz/archives/23)
+
 ## 戳一戳（纳西妲版）.js
 ### 安装
 将仓库内的js插件放入./plugin/example文件夹中，即可食用。
