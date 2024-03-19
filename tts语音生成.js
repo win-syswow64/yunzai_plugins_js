@@ -11,7 +11,7 @@ let noiseScaleW = 0.2 //发音时长
 let lengthScale = 1 //语速
 let sdp_ratio = 0.2 //SDP/DP混合比
 let language = "ZH"//语言设置
-let ttsapi = "https://v2.genshinvoice.top/run/predict"
+let ttsapi = "https://bv2.firefly.matce.cn/run/predict"
 let languageMap = {
 	"ZH": "ZH",
 	"JP": "JP",
