@@ -253,7 +253,7 @@ export class chuo extends plugin {
                         }
                     )
                     responsel = await responsel.json()
-                    audiourl = `https://v2.genshinvoice.top/file=${responsel.data[1].name}`
+                    audiourl = `https://bv2.firefly.matce.cn/file=${responsel.data[1].name}`
                 } else {
                     e.reply("API选择错误，已重置为api1")
                     ttsapichoose = 'api1'
@@ -393,7 +393,7 @@ api2支持角色
 "流浪者_ZH","辛焱_ZH","德沃沙克_ZH","雷电将军_ZH","羽生田千鹤_ZH","那维莱特_ZH","沙扎曼_ZH","纳西妲_ZH","艾伯特_ZH","龙二_ZH","旁白_ZH","克罗索_ZH","元太_ZH","阿贝多_ZH","萍姥姥_ZH",
 "久岐忍_ZH","埃洛伊_ZH","托马_ZH","迪奥娜_ZH","荧_ZH","夏洛蒂_ZH","莱欧斯利_ZH","昆钧_ZH","塞琉斯_ZH","埃泽_ZH","迪娜泽黛_ZH","知易_ZH","玛格丽特_ZH","申鹤_ZH","罗莎莉亚_ZH","娜维娅_ZH",
 "珐露珊_ZH","浮游水蕈兽·元素生命_ZH","奥兹_ZH","砂糖_ZH","绮良良_ZH","杜拉夫_ZH","魈_ZH","松浦_ZH","迈蒙_ZH","荒泷一斗_ZH","吴船长_ZH","埃尔欣根_ZH","柯莱_ZH","阿圆_ZH","「白老先生」_ZH",
-
+"五郎_ZH","「博士」_ZH"
 支持语言
-ZH:中文 
+ZH:中文   JP:日语    EN：英语
 */
