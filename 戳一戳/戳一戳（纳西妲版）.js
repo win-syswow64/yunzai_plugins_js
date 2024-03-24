@@ -253,7 +253,7 @@ export class chuo extends plugin {
                         }
                     )
                     responsel = await responsel.json()
-                    audiourl = `https://v2.genshinvoice.top/file=${responsel.data[1].name}`
+                    audiourl = `https://bv2.firefly.matce.cn/file=${responsel.data[1].name}`
                 } else {
                     e.reply("API选择错误，已重置为api1")
                     ttsapichoose = 'api1'
