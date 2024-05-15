@@ -5,6 +5,7 @@ import {
 import common from '../../lib/common/common.js';
 import fetch from 'node-fetch';
 import fs from "fs";
+import WebSocket from "ws";
 
 let noiseScale = 0.2  //情感控制
 let noiseScaleW = 0.2 //发音时长
