@@ -86,7 +86,117 @@ export class voicecreate extends plugin {
 			},]
 		})
 	}
+    async getrandom(e, redom_data, reference_audio, session_hash, text, speaker, ttsapi) {
+        if (redom_data == '' && reference_audio == '') {
+            let ws = new WebSocket('wss://fs.firefly.matce.cn/queue/join');
 
+            ws.on('message', (data) => {
+                data = JSON.parse(data);
+                if (data.msg == "send_hash") {
+                    ws.send(JSON.stringify({
+                        "fn_index": 1,
+                        "session_hash": `${session_hash}`
+                    }));
+                }
+                if (data.msg == "send_data") {
+                    ws.send(JSON.stringify({
+                        "data": [`${speaker}`],
+                        "event_data": null,
+                        "fn_index": 1,
+                        "session_hash": `${session_hash}`
+                    }));
+                }
+
+                if (data.msg == "process_completed") {
+                    redom_data = data.output.data;
+                }
+            });
+
+            ws.on('close', () => {
+                this.getreference(e, redom_data, reference_audio, session_hash, text, speaker, ttsapi);
+            });
+        }
+    }
+
+    async getreference(e, redom_data, reference_audio, session_hash, text, speaker, ttsapi) {
+        if (redom_data != '' && reference_audio == '') {
+            let ws = new WebSocket('wss://fs.firefly.matce.cn/queue/join');
+
+            ws.on('message', (data) => {
+                data = JSON.parse(data);
+                if (data.msg == "send_hash") {
+                    ws.send(JSON.stringify({
+                        "fn_index": 2,
+                        "session_hash": `${session_hash}`
+                    }));
+                }
+                if (data.msg == "send_data") {
+                    ws.send(JSON.stringify({
+                        "data": [`${redom_data[0]}`],
+                        "event_data": null,
+                        "fn_index": 2,
+                        "session_hash": `${session_hash}`
+                    }));
+                }
+                if (data.msg == "process_completed") {
+                    reference_audio = data.output.data;
+                    reference_audio[0].data = `${ttsapi}${reference_audio[0].name}`;
+                }
+            });
+
+            ws.on('close', () => {
+                this.getaudio(e, redom_data, reference_audio, text, speaker, session_hash, ttsapi);
+            });
+        }
+    }
+
+    async getaudio(e, redom_data, reference_audio, text, speaker, session_hash, ttsapi) {
+        if (redom_data != '' && reference_audio != '') {
+            let ws = new WebSocket('wss://fs.firefly.matce.cn/queue/join');
+            let audiourl = '';
+
+            ws.on('message', (data) => {
+                data = JSON.parse(data);
+                if (data.msg == "send_hash") {
+                    ws.send(JSON.stringify({
+                        "fn_index": 4,
+                        "session_hash": `${session_hash}`
+                    }));
+                }
+                if (data.msg == "send_data") {
+                    ws.send(JSON.stringify({
+                        "data": [
+                            `${text}`,
+                            true,
+                            reference_audio[0],
+                            `${redom_data[1]}`,
+                            0,
+                            48,
+                            0.7,
+                            1.5,
+                            0.7,
+                            `${speaker}`
+                        ],
+                        "event_data": null,
+                        "fn_index": 4,
+                        "session_hash": `${session_hash}`
+                    }));
+                }
+                if (data.msg == "process_completed") {
+                    audiourl = `${ttsapi}${data.output.data[0].name}`;
+                }
+            });
+
+            ws.on('close', () => {
+                if (audiourl != '') {
+                    logger.info(audiourl);
+                    e.reply(segment.record(audiourl));
+                } else {
+                    e.reply('生成失败');
+                }
+            });
+        }
+    }
 	async voicesend(e) {
 		let speaker = e.msg.replace(/语音?(.*)$/g, '')
 			.replace(/#/g, '')
@@ -98,48 +208,12 @@ export class voicecreate extends plugin {
 		let text = e.msg.replace(/^#?(.*)语音?/g, '')
 		logger.info(text)
 		logger.info(speaker)
-		let data = JSON.stringify({
-			"data": [`${text}`, `${speaker}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, true, 1, 0.2, null, "Happy", "", "", 0.7],
-			"event_data": null,
-			"fn_index": 0,
-			"session_hash": "v141oxnc02o"
-		})
-		let responsel = await fetch(ttsapi
-			, {
-				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-				'Accept-Language': 'en-US,en;q=0.5',
-				'method': 'POST',
-				'headers': {
-					'Content-Type': 'application/json',
-					'Content-Length': data.length
-				},
-				'body': data
-			}
-		)
-		responsel = await responsel.json()
-		let audiourl = `https://v2.genshinvoice.top/file=${responsel.data[1].name}`
-		fetch(audiourl)
-			.then(responsel => {
-				if (!responsel.ok) {
-					e.reply(`服务器返回状态码异常, ${responsel.status}`)
-					return false;
-				}
-				return responsel.buffer()
-			})
-			.then(async buffer => {
-				await new Promise((resolve, reject) => {
-					fs.writeFile('plugins/example/tts.wav', buffer, (err) => {
-						if (err) reject(err);
-						else resolve();
-					})
-				})
-				e.reply(segment.record('plugins/example/tts.wav'))
-				return;
-			})
-			.catch(error => {
-				e.reply(`文件保存错误`)
-				return false;
-			})
+        const session_hash = Math.random().toString(36).substring(2);
+        let redom_data = '';
+        let reference_audio = '';
+
+		this.getrandom(e, redom_data, reference_audio, session_hash, text, speaker, ttsapi);
+            return true;
 	}
 
 	async noiseScaleWset(e) {
