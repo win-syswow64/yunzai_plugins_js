@@ -1,4 +1,4 @@
-﻿import plugin from '../../lib/plugins/plugin.js'
+import plugin from '../../lib/plugins/plugin.js'
 import { segment } from 'icqq'
 import cfg from '../../lib/config/config.js'
 import common from '../../lib/common/common.js'
@@ -15,18 +15,6 @@ let reply_voice = 0.15 //语音回复概率
 let mutepick = 0.22 //禁言概率
 let example = 0 //拍一拍表情概率
 //剩下的0.08概率就是反击
-let ttsapichoose = 'api2' //api设置
-let noiseScale = 0.2  //情感控制
-let noiseScaleW = 0.2 //发音时长
-let lengthScale = 1 //语速
-let sdp_ratio = 0.2 //SDP/DP混合比
-let language = 'ZH'
-let api1url = 'https://api.lolimi.cn/API/yyhc/y.php'
-let api2url = 'https://bv2.firefly.matce.cn/run/predict'
-let uploadRecord = ""
-let speakerapi1 = "纳西妲" //生成角色api1
-let speakerapi2 = "纳西妲_ZH" //生成角色api2
-let text = ""
 let master = "主人"
 let mutetime = 0 //禁言时间设置，单位分钟，如果设置0则为自动递增，如需关闭禁言请修改触发概率为0
 
@@ -81,47 +69,6 @@ let ciku_ = [
     "纳西妲今天已经被戳了_num_次啦，不准戳了！！！",
     "纳西妲今天已经被戳了_num_次啦，再戳就坏了！",
 ];
-
-
-//语音回复文字，不能包含英文，特殊字符和颜文字，生成时间根据文字长度变化，添加文字时请安装我的格式进行添加，不能随意添加出bug我一律不管
-let voice = ['看我超级纳西妲旋风！',
-    '被戳晕了……轻一点啦！',
-    '救命啊，有变态>_<！！！',
-    '哼~~~',
-    '你戳谁呢！你戳谁呢！！！           o(´^｀)o',
-    '是不是要本萝莉揍你一顿才开心啊！！！',
-    '唔，这触感有种被兰那罗拿胡萝卜指着的感觉≥﹏≤',
-    '不要再戳了！我真的要被你气死了！！！',
-    '怎么会有你这么无聊的人啊！！！(￢_￢)',
-    '哼，我可是会还手的哦——“所闻遍计！”',
-    '把嘴张开（抬起脚）',
-    '啊……你戳疼我了Ծ‸Ծ',
-    '你干嘛！',
-    '我生气了！砸挖撸多!木大！木大木大！',
-    '你是不是喜欢我？',
-    '朗达哟？',
-    '变态萝莉控！',
-    '要戳坏掉了>_<',
-    '旅行者，你没睡醒吗？一天天就知道戳我',
-    '别戳了！在戳就丢你去喂鱼',
-    '你戳我干嘛,闲得蛋疼吗?',
-    '你刚刚是不是戳我了，你是坏蛋！我要戳回去，哼！！！',
-    '手痒痒,老是喜欢戳人。',
-    '你戳我,我咬你!',
-    '戳来戳去的,真是的... ',
-    '戳我也没用,改变不了你单身的事实。',
-    '戏精,你戳我有完没完?',
-    '戳我干嘛,要不要脸啊你!',
-    '戳人家干嘛,难道我长得很好戳?',
-    '戳完了,满足你的戳癖了吧!',
-    '戳我啊,等会儿我报复,就不止戳一戳那么简单!',
-    '你戳我,是想逗我开心吗?那我很开心噢!',
-    '没事找事,真是的',
-    '拜托,旅行者你能不能消停会?',
-    '行了行了,戳完了没?闹腾完了没?',
-    '你再戳,纳西妲要生气了哦',
-    '惹不起,躲得起,您别老戳人家了行不?',
-    '戳我一下,告诉我你有完没完']
 
 export class chuo extends plugin {
     constructor() {
@@ -232,63 +179,7 @@ export class chuo extends plugin {
             //回复随机语音
             else if (random_type < (reply_text + reply_img + reply_voice)) {
                 logger.info('[回复随机语音生效]')
-                let Text = voice[Math.floor(Math.random() * voice.length)];
-                text = `${Text}` //更新合成内容
-                logger.info(`合成:${text}`)
-                let audiourl = ''
-                if (ttsapichoose == 'api1') {
-                    let audioLink = `${api1url}?msg=${text}&speaker=${speakerapi1}&Length=${lengthScale}&noisew=${noiseScaleW}&sdp=${sdp_ratio}&noise=${noiseScale}&yy='中'`
-                    let responsel = await fetch(audioLink)
-                    responsel = await responsel.json()
-                    audiourl = responsel.music
-                } else if (ttsapichoose == 'api2') {
-                    let data = JSON.stringify({
-                        "data": [`${text}`, `${speakerapi2}`, sdp_ratio, noiseScale, noiseScaleW, lengthScale, `${language}`, true, 1, 0.2, null, "Happy", "", "", 0.7],
-                        "event_data": null,
-                        "fn_index": 0,
-                        "session_hash": "v141oxnc02o"
-                    })
-                    let responsel = await fetch(api2url
-                        , {
-                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-                            'Accept-Language': 'en-US,en;q=0.5',
-                            'method': 'POST',
-                            'headers': {
-                                'Content-Type': 'application/json',
-                                'Content-Length': data.length
-                            },
-                            'body': data
-                        }
-                    )
-                    responsel = await responsel.json()
-                    audiourl = `https://bv2.firefly.matce.cn/file=${responsel.data[1].name}`
-                } else {
-                    e.reply("API选择错误，已重置为api1")
-                    ttsapichoose = 'api1'
-                    return;
-                }
-                fetch(audiourl)
-                    .then(responsel => {
-                        if (!responsel.ok) {
-                            e.reply(`服务器返回状态码异常, ${responsel.status}`)
-                            return false;
-                        }
-                        return responsel.buffer()
-                    })
-                    .then(async buffer => {
-                        await new Promise((resolve, reject) => {
-                            fs.writeFile('plugins/example/audo.wav', buffer, (err) => {
-                                if (err) reject(err);
-                                else resolve();
-                            })
-                        })
-                        e.reply(segment.record('plugins/example/audo.wav'))
-                        return;
-                    })
-                    .catch(error => {
-                        e.reply(`文件保存错误`)
-                        return false;
-                    })
+                e.reply(segment.record('https://api.xingdream.top/API/pokevoice.php'));
             }
             //禁言
             else if (random_type < (reply_text + reply_img + reply_voice + mutepick)) {
