@@ -11,9 +11,9 @@
 
 ## 重要：tts语音与戳一戳语音必须安装ffmpeg。
 
-[点我查看Windows教程](https://blog.115832958.xyz/archives/8)
+[点我查看Windows教程](https://blog.nahidaya.top/archives/31)
 
-[点我查看Linux教程](https://blog.115832958.xyz/archives/23)
+[点我查看Linux教程](https://blog.nahidaya.top/archives/28)
 
 ## 戳一戳（纳西妲版）.js
 # 由于需要增加依赖项，Miao-yunzai社区不同意将其加入Miao-yunzai依赖，故在线实时合成修改为固定API音频提供。如需新增音频或角色，请加Q群：703864769找群主反馈。
