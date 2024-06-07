@@ -106,7 +106,7 @@ export class chuo extends plugin {
         if (e.target_id == e.self_id) {
             logger.info('[戳一戳生效]')
             let count = await redis.get(`Yz:pokecount:`);
-            let group = Bot.pickGroup(`${e.group_id}`,true);
+            let group = Bot.pickGroup(e.group_id);
             let usercount = mutetime - 1
             if (mutetime == 0) {
                 usercount = await redis.get('Yz:pokecount' + e.operator_id + ':')
