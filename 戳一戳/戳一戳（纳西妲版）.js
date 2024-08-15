@@ -4,8 +4,6 @@ import cfg from '../../lib/config/config.js'
 import common from '../../lib/common/common.js'
 import moment from "moment";
 import fetch from 'node-fetch'
-import fs from 'fs'
-const path = process.cwd()
 
 // 支持信息详见文件最下方
 //在这里设置事件概率,请保证概率加起来小于1，少于1的部分会触发反击
@@ -17,13 +15,6 @@ let example = 0 //拍一拍表情概率
 //剩下的0.08概率就是反击
 let master = "主人"
 let mutetime = 0 //禁言时间设置，单位分钟，如果设置0则为自动递增，如需关闭禁言请修改触发概率为0
-
-//定义图片存放路径 默认是Yunzai-Bot/resources/chuochuo
-const chuo_path = path + '/resources/chuochuo/';
-
-//图片需要从1开始用数字命名并且保存为jpg或者gif格式，存在Yunzai-Bot/resources/chuochuo目录下
-let jpg_number = 80 //输入jpg图片数量
-let gif_number = 3 //输入gif图片数量
 
 //回复文字列表
 let word_list = [
@@ -94,14 +85,31 @@ export class chuo extends plugin {
             if (cfg.masterQQ.includes(e.operator_id) || e.self_id == e.operator_id) {
                 return;
             }
-            e.reply([
-                segment.at(e.operator_id),
-                `\n你几把谁啊, 竟敢戳我亲爱滴${master}, 胆子好大啊你`,
-                segment.image(path + `/resources/chuochuo/生气.gif`),
-            ], true)
-            await common.sleep(1000);
-            e.group.pokeMember(e.operator_id);
-            return true
+            fetch("https://api.xingdream.top/API/poke.php?status=angry").then(Response => Response.json()).then(data => {
+                if (data) {
+                    if (data.status == 200) {
+                        try {
+                            e.reply([
+                                segment.at(e.operator_id),
+                                `\n你几把谁啊, 竟敢戳我亲爱滴${master}, 胆子好大啊你`,
+                                segment.image(data.link),
+                            ], true)
+                            common.sleep(1000);
+                            e.group.pokeMember(e.operator_id);
+                            return true
+                        }
+                        catch (err) {
+                            e.reply('图片获取失败，请检查网络链接或联系开发者。');
+                        }
+                    }
+                    else {
+                        e.reply(`获取图链失败，错误码：${data.status}`);
+                    }
+                }
+                else {
+                    e.reply('图片api异常。');
+                }
+            })
         }
         if (e.target_id == e.self_id) {
             logger.info('[戳一戳生效]')
